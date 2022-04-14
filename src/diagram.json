@@ -1,0 +1,21 @@
+{
+    "version": 1,
+    "author": "dchekmarev",
+    "editor": "wokwi",
+    "parts": [
+      {
+        "type": "wokwi-attiny85",
+        "id": "tiny",
+        "top": -96.46,
+        "left": -62.73,
+        "attrs": { "frequency": "16m" }
+      },
+      { "type": "wokwi-ssd1306", "id": "oled1", "top": 3.67, "left": -147.32, "attrs": {} }
+    ],
+    "connections": [
+      [ "oled1:GND", "tiny:GND", "black", [ "v-35.75", "h18.95" ] ],
+      [ "tiny:PB0", "oled1:DATA", "green", [ "h-0.42", "v-34.65", "h-109.91" ] ],
+      [ "tiny:PB2", "oled1:CLK", "green", [ "v-19.77", "h-52.7" ] ],
+      [ "tiny:VCC", "oled1:VIN", "red", [ "v-11.86", "h-10.04", "v88.67", "h12.89" ] ]
+    ]
+  }
