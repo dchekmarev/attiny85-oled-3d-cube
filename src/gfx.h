@@ -19,13 +19,53 @@ void firstPage() {
   clearPage();
 }
 
+// init sequence, from u8g2lib
+static const uint8_t ssd1306_128x64_noname_init_seq[] PROGMEM = {
+  0x0ae,		                /* display off */
+  0x0d5, 0x080,		/* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
+  0x0a8, 0x03f,		/* multiplex ratio */
+  0x0d3, 0x000,		/* display offset */
+  0x040,		                /* set display start line to 0 */
+  0x08d, 0x014,		/* [2] charge pump setting (p62): 0x014 enable, 0x010 disable, SSD1306 only, should be removed for SH1106 */
+  0x020, 0x000,		/* horizontal addressing mode */
+  
+  0x0a1,				/* segment remap a0/a1*/
+  0x0c8,				/* c0: scan dir normal, c8: reverse */
+  // Flipmode
+  // U8X8_C(0x0a0),				/* segment remap a0/a1*/
+  // U8X8_C(0x0c0),				/* c0: scan dir normal, c8: reverse */
+  
+  0x0da, 0x012,		/* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
+
+  0x081, 0x0cf, 		/* [2] set contrast control */
+  0x0d9, 0x0f1, 		/* [2] pre-charge period 0x022/f1*/
+  0x0db, 0x040, 		/* vcomh deselect level */  
+  // if vcomh is 0, then this will give the biggest range for contrast control issue #98
+  // restored the old values for the noname constructor, because vcomh=0 will not work for all OLEDs, #116
+  
+  0x02e,				/* Deactivate scroll */ 
+  0x0a4,				/* output ram to display */
+  0x0a6,				/* none inverted normal display mode */
+  0x0af,		                /* display on */
+};
+
+void displayInit() {
+  i2c_start();
+  i2c_tx((I2C_ADDR << 1));
+  i2c_tx(0x00);
+  for (int i = 0; i < sizeof(ssd1306_128x64_noname_init_seq); i++) {
+    i2c_tx(pgm_read_byte(ssd1306_128x64_noname_init_seq + i));
+  }
+  i2c_stop();
+}
+
 /**
  * copy pixels via i2c to oled display
  */
 void displayPage() {
   i2c_start();
-  i2c_tx((I2C_ADDR << 1));   
-  i2c_tx(0x00);              // Sending command
+  i2c_tx((I2C_ADDR << 1));
+  i2c_tx(0x00);
   i2c_tx(0x21);              // Set Column
   i2c_tx(0x00);              // Start at column 0
   i2c_tx(SCREEN_WIDTH - 1);  // End at 127
